@@ -24,13 +24,13 @@ jobs:
 
       - name: Download pip packages (Linux x86_64)
         run: |
-          OPTS="--platform manylinux_2_28_x86_64 --python-version 312 --implementation cp --abi cp312 --only-binary=:all:"
-          pip3 download -d lib-linux-manylinux_2_28-python-docx-pillow  $OPTS python-docx Pillow
-          pip3 download -d lib-linux-manylinux_2_28-docling-mcp         $OPTS "docling-mcp[local]"
-          pip3 download -d lib-linux-manylinux_2_28-docling             $OPTS docling
-          pip3 download -d lib-linux-manylinux_2_28-markitdown          $OPTS "markitdown[pptx,docx,xlsx,xls,pdf]"
-          pip3 download -d lib-linux-manylinux_2_28-markitdown-ocr      $OPTS markitdown-ocr
-          pip3 download -d lib-linux-manylinux_2_28-markitdown-mcp      $OPTS markitdown-mcp
+          # runner (ubuntu-latest) がネイティブ Linux x86_64 なので --platform 不要
+          pip3 download -d lib-linux-python-docx-pillow  python-docx Pillow
+          pip3 download -d lib-linux-docling-mcp         "docling-mcp[local]"
+          pip3 download -d lib-linux-docling             docling
+          pip3 download -d lib-linux-markitdown          "markitdown[pptx,docx,xlsx,xls,pdf]"
+          pip3 download -d lib-linux-markitdown-ocr      markitdown-ocr
+          pip3 download -d lib-linux-markitdown-mcp      markitdown-mcp
 
       - name: Download pip packages (Windows x86_64)
         run: |
@@ -45,12 +45,12 @@ jobs:
       - name: Create zipballs
         run: |
           TAG=${{ steps.tag.outputs.value }}
-          zip -r pip-packages-python-docx-pillow-linux-manylinux_2_28-x86_64-${TAG}.zip   lib-linux-manylinux_2_28-python-docx-pillow/
-          zip -r pip-packages-docling-mcp-linux-manylinux_2_28-x86_64-${TAG}.zip          lib-linux-manylinux_2_28-docling-mcp/
-          zip -r pip-packages-docling-linux-manylinux_2_28-x86_64-${TAG}.zip              lib-linux-manylinux_2_28-docling/
-          zip -r pip-packages-markitdown-linux-manylinux_2_28-x86_64-${TAG}.zip           lib-linux-manylinux_2_28-markitdown/
-          zip -r pip-packages-markitdown-ocr-linux-manylinux_2_28-x86_64-${TAG}.zip       lib-linux-manylinux_2_28-markitdown-ocr/
-          zip -r pip-packages-markitdown-mcp-linux-manylinux_2_28-x86_64-${TAG}.zip       lib-linux-manylinux_2_28-markitdown-mcp/
+          zip -r pip-packages-python-docx-pillow-linux-x86_64-${TAG}.zip   lib-linux-python-docx-pillow/
+          zip -r pip-packages-docling-mcp-linux-x86_64-${TAG}.zip          lib-linux-docling-mcp/
+          zip -r pip-packages-docling-linux-x86_64-${TAG}.zip              lib-linux-docling/
+          zip -r pip-packages-markitdown-linux-x86_64-${TAG}.zip           lib-linux-markitdown/
+          zip -r pip-packages-markitdown-ocr-linux-x86_64-${TAG}.zip       lib-linux-markitdown-ocr/
+          zip -r pip-packages-markitdown-mcp-linux-x86_64-${TAG}.zip       lib-linux-markitdown-mcp/
           zip -r pip-packages-python-docx-pillow-windows-x86_64-${TAG}.zip lib-windows-python-docx-pillow/
           zip -r pip-packages-docling-mcp-windows-x86_64-${TAG}.zip        lib-windows-docling-mcp/
           zip -r pip-packages-docling-windows-x86_64-${TAG}.zip            lib-windows-docling/
@@ -68,12 +68,12 @@ jobs:
 
             | ファイル | 含まれるパッケージ | プラットフォーム |
             |---|---|---|
-            | pip-packages-python-docx-pillow-linux-manylinux_2_28-x86_64-*.zip |python-docx, Pillow | Linux x86_64 (manylinux_2_28+) |
-            | pip-packages-docling-mcp-linux-manylinux_2_28-x86_64-*.zip |docling-mcp[local] | Linux x86_64 (manylinux_2_28+) |
-            | pip-packages-docling-linux-manylinux_2_28-x86_64-*.zip |docling | Linux x86_64 (manylinux_2_28+) |
-            | pip-packages-markitdown-linux-manylinux_2_28-x86_64-*.zip |markitdown[pptx,docx,xlsx,xls,pdf] | Linux x86_64 (manylinux_2_28+) |
-            | pip-packages-markitdown-ocr-linux-manylinux_2_28-x86_64-*.zip |markitdown-ocr | Linux x86_64 (manylinux_2_28+) |
-            | pip-packages-markitdown-mcp-linux-manylinux_2_28-x86_64-*.zip |markitdown-mcp | Linux x86_64 (manylinux_2_28+) |
+            | pip-packages-python-docx-pillow-linux-x86_64-*.zip | python-docx, Pillow | Linux x86_64 |
+            | pip-packages-docling-mcp-linux-x86_64-*.zip | docling-mcp[local] | Linux x86_64 |
+            | pip-packages-docling-linux-x86_64-*.zip | docling | Linux x86_64 |
+            | pip-packages-markitdown-linux-x86_64-*.zip | markitdown[pptx,docx,xlsx,xls,pdf] | Linux x86_64 |
+            | pip-packages-markitdown-ocr-linux-x86_64-*.zip | markitdown-ocr | Linux x86_64 |
+            | pip-packages-markitdown-mcp-linux-x86_64-*.zip | markitdown-mcp | Linux x86_64 |
             | pip-packages-python-docx-pillow-windows-x86_64-*.zip | python-docx, Pillow | Windows x86_64 |
             | pip-packages-docling-mcp-windows-x86_64-*.zip | docling-mcp[local] | Windows x86_64 |
             | pip-packages-docling-windows-x86_64-*.zip | docling | Windows x86_64 |
@@ -81,12 +81,12 @@ jobs:
             | pip-packages-markitdown-ocr-windows-x86_64-*.zip | markitdown-ocr | Windows x86_64 |
             | pip-packages-markitdown-mcp-windows-x86_64-*.zip | markitdown-mcp | Windows x86_64 |
           files: |
-            pip-packages-python-docx-pillow-linux-manylinux_2_28-x86_64-${{ steps.tag.outputs.value }}.zip
-            pip-packages-docling-mcp-linux-manylinux_2_28-x86_64-${{ steps.tag.outputs.value }}.zip
-            pip-packages-docling-linux-manylinux_2_28-x86_64-${{ steps.tag.outputs.value }}.zip
-            pip-packages-markitdown-linux-manylinux_2_28-x86_64-${{ steps.tag.outputs.value }}.zip
-            pip-packages-markitdown-ocr-linux-manylinux_2_28-x86_64-${{ steps.tag.outputs.value }}.zip
-            pip-packages-markitdown-mcp-linux-manylinux_2_28-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-python-docx-pillow-linux-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-docling-mcp-linux-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-docling-linux-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-markitdown-linux-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-markitdown-ocr-linux-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-markitdown-mcp-linux-x86_64-${{ steps.tag.outputs.value }}.zip
             pip-packages-python-docx-pillow-windows-x86_64-${{ steps.tag.outputs.value }}.zip
             pip-packages-docling-mcp-windows-x86_64-${{ steps.tag.outputs.value }}.zip
             pip-packages-docling-windows-x86_64-${{ steps.tag.outputs.value }}.zip
