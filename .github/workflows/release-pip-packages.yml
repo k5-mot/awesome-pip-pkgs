@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -45,7 +45,7 @@ jobs:
           zip -r pip-packages-markitdown-mcp-linux-x86_64-${TAG}.zip       lib-markitdown-mcp/
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: linux-packages
           path: "*.zip"
@@ -55,7 +55,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -81,7 +81,7 @@ jobs:
           Compress-Archive -Path lib-markitdown-mcp      -DestinationPath "pip-packages-markitdown-mcp-windows-x86_64-${TAG}.zip"
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-packages
           path: "*.zip"
@@ -93,12 +93,12 @@ jobs:
       contents: write
     steps:
       - name: Download Linux packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: linux-packages
 
       - name: Download Windows packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: windows-packages
 
