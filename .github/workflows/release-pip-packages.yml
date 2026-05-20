@@ -20,26 +20,43 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
-      - name: Download pip packages
+      - name: Download pip packages (Linux x86_64)
         run: |
-          pip3 download -d lib-python-docx-pillow python-docx Pillow
-          pip3 download -d lib-docling-mcp "docling-mcp[local]"
-          pip3 download -d lib-docling docling
-          pip3 download -d lib-markitdown "markitdown[pptx,docx,xlsx,xls,pdf]"
-          pip3 download -d lib-markitdown-ocr markitdown-ocr
-          pip3 download -d lib-markitdown-mcp markitdown-mcp
+          OPTS="--platform manylinux2014_x86_64 --python-version 312 --implementation cp --abi cp312 --only-binary=:all:"
+          pip3 download -d lib-linux-python-docx-pillow  $OPTS python-docx Pillow
+          pip3 download -d lib-linux-docling-mcp         $OPTS "docling-mcp[local]"
+          pip3 download -d lib-linux-docling             $OPTS docling
+          pip3 download -d lib-linux-markitdown          $OPTS "markitdown[pptx,docx,xlsx,xls,pdf]"
+          pip3 download -d lib-linux-markitdown-ocr      $OPTS markitdown-ocr
+          pip3 download -d lib-linux-markitdown-mcp      $OPTS markitdown-mcp
+
+      - name: Download pip packages (Windows x86_64)
+        run: |
+          OPTS="--platform win_amd64 --python-version 312 --implementation cp --abi cp312 --only-binary=:all:"
+          pip3 download -d lib-windows-python-docx-pillow  $OPTS python-docx Pillow
+          pip3 download -d lib-windows-docling-mcp         $OPTS "docling-mcp[local]"
+          pip3 download -d lib-windows-docling             $OPTS docling
+          pip3 download -d lib-windows-markitdown          $OPTS "markitdown[pptx,docx,xlsx,xls,pdf]"
+          pip3 download -d lib-windows-markitdown-ocr      $OPTS markitdown-ocr
+          pip3 download -d lib-windows-markitdown-mcp      $OPTS markitdown-mcp
 
       - name: Create zipballs
         run: |
           TAG=${{ steps.tag.outputs.value }}
-          zip -r pip-packages-python-docx-pillow-${TAG}.zip    lib-python-docx-pillow/
-          zip -r pip-packages-docling-mcp-${TAG}.zip           lib-docling-mcp/
-          zip -r pip-packages-docling-${TAG}.zip               lib-docling/
-          zip -r pip-packages-markitdown-${TAG}.zip            lib-markitdown/
-          zip -r pip-packages-markitdown-ocr-${TAG}.zip        lib-markitdown-ocr/
-          zip -r pip-packages-markitdown-mcp-${TAG}.zip        lib-markitdown-mcp/
+          zip -r pip-packages-python-docx-pillow-linux-x86_64-${TAG}.zip   lib-linux-python-docx-pillow/
+          zip -r pip-packages-docling-mcp-linux-x86_64-${TAG}.zip          lib-linux-docling-mcp/
+          zip -r pip-packages-docling-linux-x86_64-${TAG}.zip              lib-linux-docling/
+          zip -r pip-packages-markitdown-linux-x86_64-${TAG}.zip           lib-linux-markitdown/
+          zip -r pip-packages-markitdown-ocr-linux-x86_64-${TAG}.zip       lib-linux-markitdown-ocr/
+          zip -r pip-packages-markitdown-mcp-linux-x86_64-${TAG}.zip       lib-linux-markitdown-mcp/
+          zip -r pip-packages-python-docx-pillow-windows-x86_64-${TAG}.zip lib-windows-python-docx-pillow/
+          zip -r pip-packages-docling-mcp-windows-x86_64-${TAG}.zip        lib-windows-docling-mcp/
+          zip -r pip-packages-docling-windows-x86_64-${TAG}.zip            lib-windows-docling/
+          zip -r pip-packages-markitdown-windows-x86_64-${TAG}.zip         lib-windows-markitdown/
+          zip -r pip-packages-markitdown-ocr-windows-x86_64-${TAG}.zip     lib-windows-markitdown-ocr/
+          zip -r pip-packages-markitdown-mcp-windows-x86_64-${TAG}.zip     lib-windows-markitdown-mcp/
 
       - name: Create GitHub Release and upload assets
         uses: softprops/action-gh-release@v2
@@ -49,18 +66,30 @@ jobs:
           body: |
             Offline pip packages bundle.
 
-            | ファイル | 含まれるパッケージ |
-            |---|---|
-            | pip-packages-python-docx-pillow-*.zip | python-docx, Pillow |
-            | pip-packages-docling-mcp-*.zip | docling-mcp[local] |
-            | pip-packages-docling-*.zip | docling |
-            | pip-packages-markitdown-*.zip | markitdown[pptx,docx,xlsx,xls,pdf] |
-            | pip-packages-markitdown-ocr-*.zip | markitdown-ocr |
-            | pip-packages-markitdown-mcp-*.zip | markitdown-mcp |
+            | ファイル | 含まれるパッケージ | プラットフォーム |
+            |---|---|---|
+            | pip-packages-python-docx-pillow-linux-x86_64-*.zip | python-docx, Pillow | Linux x86_64 |
+            | pip-packages-docling-mcp-linux-x86_64-*.zip | docling-mcp[local] | Linux x86_64 |
+            | pip-packages-docling-linux-x86_64-*.zip | docling | Linux x86_64 |
+            | pip-packages-markitdown-linux-x86_64-*.zip | markitdown[pptx,docx,xlsx,xls,pdf] | Linux x86_64 |
+            | pip-packages-markitdown-ocr-linux-x86_64-*.zip | markitdown-ocr | Linux x86_64 |
+            | pip-packages-markitdown-mcp-linux-x86_64-*.zip | markitdown-mcp | Linux x86_64 |
+            | pip-packages-python-docx-pillow-windows-x86_64-*.zip | python-docx, Pillow | Windows x86_64 |
+            | pip-packages-docling-mcp-windows-x86_64-*.zip | docling-mcp[local] | Windows x86_64 |
+            | pip-packages-docling-windows-x86_64-*.zip | docling | Windows x86_64 |
+            | pip-packages-markitdown-windows-x86_64-*.zip | markitdown[pptx,docx,xlsx,xls,pdf] | Windows x86_64 |
+            | pip-packages-markitdown-ocr-windows-x86_64-*.zip | markitdown-ocr | Windows x86_64 |
+            | pip-packages-markitdown-mcp-windows-x86_64-*.zip | markitdown-mcp | Windows x86_64 |
           files: |
-            pip-packages-python-docx-pillow-${{ steps.tag.outputs.value }}.zip
-            pip-packages-docling-mcp-${{ steps.tag.outputs.value }}.zip
-            pip-packages-docling-${{ steps.tag.outputs.value }}.zip
-            pip-packages-markitdown-${{ steps.tag.outputs.value }}.zip
-            pip-packages-markitdown-ocr-${{ steps.tag.outputs.value }}.zip
-            pip-packages-markitdown-mcp-${{ steps.tag.outputs.value }}.zip
+            pip-packages-python-docx-pillow-linux-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-docling-mcp-linux-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-docling-linux-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-markitdown-linux-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-markitdown-ocr-linux-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-markitdown-mcp-linux-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-python-docx-pillow-windows-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-docling-mcp-windows-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-docling-windows-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-markitdown-windows-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-markitdown-ocr-windows-x86_64-${{ steps.tag.outputs.value }}.zip
+            pip-packages-markitdown-mcp-windows-x86_64-${{ steps.tag.outputs.value }}.zip
