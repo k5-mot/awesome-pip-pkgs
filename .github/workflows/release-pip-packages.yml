@@ -44,6 +44,17 @@ jobs:
           zip -r pip-packages-markitdown-ocr-linux-x86_64-${TAG}.zip       lib-markitdown-ocr/
           zip -r pip-packages-markitdown-mcp-linux-x86_64-${TAG}.zip       lib-markitdown-mcp/
 
+      - name: Split oversized zipballs
+        run: |
+          for f in *.zip; do
+            SIZE=$(stat -c%s "$f")
+            if [ "$SIZE" -gt 1900000000 ]; then
+              BASE="${f%.zip}"
+              split -b 1900m --additional-suffix=.zip --numeric-suffixes=1 "$f" "${BASE}.part"
+              rm "$f"
+            fi
+          done
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
@@ -80,6 +91,18 @@ jobs:
           Compress-Archive -Path lib-markitdown-ocr      -DestinationPath "pip-packages-markitdown-ocr-windows-x86_64-${TAG}.zip"
           Compress-Archive -Path lib-markitdown-mcp      -DestinationPath "pip-packages-markitdown-mcp-windows-x86_64-${TAG}.zip"
 
+      - name: Split oversized zipballs
+        shell: bash
+        run: |
+          for f in *.zip; do
+            SIZE=$(stat -c%s "$f")
+            if [ "$SIZE" -gt 1900000000 ]; then
+              BASE="${f%.zip}"
+              split -b 1900m --additional-suffix=.zip --numeric-suffixes=1 "$f" "${BASE}.part"
+              rm "$f"
+            fi
+          done
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
@@ -102,11 +125,30 @@ jobs:
         with:
           name: windows-packages
 
+      - name: Filter uploadable files (under 2GB)
+        id: files
+        run: |
+          LIST=""
+          for f in *.zip; do
+            SIZE=$(stat -c%s "$f")
+            if [ "$SIZE" -le 1900000000 ]; then
+              LIST="${LIST}${f}\n"
+            else
+              echo "::warning::Skipping $f: $(numfmt --to=iec $SIZE) exceeds 1.9 GB limit"
+            fi
+          done
+          {
+            echo "list<<EOF"
+            printf "%b" "$LIST"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Create GitHub Release and upload assets
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.setup.outputs.tag }}
           name: Pip Packages ${{ needs.setup.outputs.tag }}
+          fail_on_unmatched_files: false
           body: |
             Offline pip packages bundle.
 
@@ -124,4 +166,4 @@ jobs:
             | pip-packages-markitdown-windows-x86_64-*.zip | markitdown[pptx,docx,xlsx,xls,pdf] | Windows x86_64 |
             | pip-packages-markitdown-ocr-windows-x86_64-*.zip | markitdown-ocr | Windows x86_64 |
             | pip-packages-markitdown-mcp-windows-x86_64-*.zip | markitdown-mcp | Windows x86_64 |
-          files: "*.zip"
+          files: ${{ steps.files.outputs.list }}
