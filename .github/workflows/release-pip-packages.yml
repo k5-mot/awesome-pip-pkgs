@@ -24,20 +24,24 @@ jobs:
 
       - name: Download pip packages
         run: |
-          pip3 download -d lib \
-            python-docx \
-            "docling-mcp[local]" \
-            docling \
-            Pillow \
-            "markitdown[pptx,docx,xlsx,xls,pdf]" \
-            markitdown-ocr \
-            markitdown-mcp
+          pip3 download -d lib-python-docx-pillow python-docx Pillow
+          pip3 download -d lib-docling-mcp "docling-mcp[local]"
+          pip3 download -d lib-docling docling
+          pip3 download -d lib-markitdown "markitdown[pptx,docx,xlsx,xls,pdf]"
+          pip3 download -d lib-markitdown-ocr markitdown-ocr
+          pip3 download -d lib-markitdown-mcp markitdown-mcp
 
-      - name: Create zipball
+      - name: Create zipballs
         run: |
-          zip -r pip-packages-${{ steps.tag.outputs.value }}.zip lib/
+          TAG=${{ steps.tag.outputs.value }}
+          zip -r pip-packages-python-docx-pillow-${TAG}.zip    lib-python-docx-pillow/
+          zip -r pip-packages-docling-mcp-${TAG}.zip           lib-docling-mcp/
+          zip -r pip-packages-docling-${TAG}.zip               lib-docling/
+          zip -r pip-packages-markitdown-${TAG}.zip            lib-markitdown/
+          zip -r pip-packages-markitdown-ocr-${TAG}.zip        lib-markitdown-ocr/
+          zip -r pip-packages-markitdown-mcp-${TAG}.zip        lib-markitdown-mcp/
 
-      - name: Create GitHub Release and upload asset
+      - name: Create GitHub Release and upload assets
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag.outputs.value }}
@@ -45,12 +49,18 @@ jobs:
           body: |
             Offline pip packages bundle.
 
-            Included packages:
-            - python-docx
-            - docling-mcp[local]
-            - docling
-            - Pillow
-            - markitdown[pptx,docx,xlsx,xls,pdf]
-            - markitdown-ocr
-            - markitdown-mcp
-          files: pip-packages-${{ steps.tag.outputs.value }}.zip
+            | ファイル | 含まれるパッケージ |
+            |---|---|
+            | pip-packages-python-docx-pillow-*.zip | python-docx, Pillow |
+            | pip-packages-docling-mcp-*.zip | docling-mcp[local] |
+            | pip-packages-docling-*.zip | docling |
+            | pip-packages-markitdown-*.zip | markitdown[pptx,docx,xlsx,xls,pdf] |
+            | pip-packages-markitdown-ocr-*.zip | markitdown-ocr |
+            | pip-packages-markitdown-mcp-*.zip | markitdown-mcp |
+          files: |
+            pip-packages-python-docx-pillow-${{ steps.tag.outputs.value }}.zip
+            pip-packages-docling-mcp-${{ steps.tag.outputs.value }}.zip
+            pip-packages-docling-${{ steps.tag.outputs.value }}.zip
+            pip-packages-markitdown-${{ steps.tag.outputs.value }}.zip
+            pip-packages-markitdown-ocr-${{ steps.tag.outputs.value }}.zip
+            pip-packages-markitdown-mcp-${{ steps.tag.outputs.value }}.zip
