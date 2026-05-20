@@ -1,0 +1,54 @@
+name: Release Pip Packages
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate tag
+        id: tag
+        run: echo "value=v$(date +'%Y.%m.%d')" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download pip packages
+        run: |
+          pip3 download -d lib \
+            python-docx \
+            "docling-mcp[local]" \
+            docling \
+            Pillow \
+            "markitdown[pptx,docx,xlsx,xls,pdf]" \
+            markitdown-ocr \
+            markitdown-mcp
+
+      - name: Create zipball
+        run: |
+          zip -r pip-packages-${{ steps.tag.outputs.value }}.zip lib/
+
+      - name: Create GitHub Release and upload asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.value }}
+          name: Pip Packages ${{ steps.tag.outputs.value }}
+          body: |
+            Offline pip packages bundle.
+
+            Included packages:
+            - python-docx
+            - docling-mcp[local]
+            - docling
+            - Pillow
+            - markitdown[pptx,docx,xlsx,xls,pdf]
+            - markitdown-ocr
+            - markitdown-mcp
+          files: pip-packages-${{ steps.tag.outputs.value }}.zip
